@@ -20,9 +20,10 @@ from steamship.utils.repl import AgentREPL
 from steamship_langchain.chat_models import ChatOpenAI
 from steamship_langchain.memory import ChatMessageHistory
 from steamship_langchain.vectorstores import SteamshipVectorStore
-
-from agent.base import LangChainTelegramBot, TelegramTransportConfig
-
+from steamship.agents.mixins.transports.telegram import (
+    TelegramTransport,
+    TelegramTransportConfig,
+)
 # noinspection PyUnresolvedReferences
 from agent.tools import (
     GenerateImageTool,
@@ -55,7 +56,7 @@ class ChatbotConfig(TelegramTransportConfig):
         default="", description="Optional voice_id for ElevenLabs Voice Bot"
     )
     use_gpt4: bool = Field(
-        True,
+        False,
         description="If True, use GPT-4. Use GPT-3.5 if False. "
         "GPT-4 generates better responses at higher cost and latency.",
     )
@@ -73,7 +74,7 @@ class MyBot(LangChainTelegramBot):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.model_name = "gpt-4" if self.config.use_gpt4 else "gpt-3.5-turbo"
+        self.model_name = "gpt-3.5-turbo-16k" if self.config.use_gpt4 else "gpt-3.5-turbo"
 
     def chunk(
         self, text: List[Document], chunk_size: int = 1_000, chunk_overlap: int = 300
